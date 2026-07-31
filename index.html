@@ -66,6 +66,13 @@
 
                         const road = new THREE.Mesh(new THREE.PlaneGeometry(30,30), new THREE.MeshStandardMaterial({color:0x232527, roughness:0.95}));
                         road.rotation.x = -Math.PI/2; scene.add(road);
+                        const texLoader = new THREE.TextureLoader();
+                        const roadTexture = texLoader.load('https://three.js.org/examles/textures/hardwood2_diffuse.jpg');
+                        roadTexture.wrapS = THREE.RepeatWrapping;
+                        roadTexture.wrapT = THREE.RepeatWrapping;
+                        roadTexture.repeat.set(6, 6);
+                        road.material.map = roadTexture;
+                        road.material.needsUpdate = true;
 
                         const poleMat = new THREE.MeshStandardMaterial({color:0x2b2e33, metalness:0.4, roughness:0.5});
                         const pole = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.2, 0.18), poleMat);
