@@ -19,3 +19,94 @@
         </style>
     </head>
     <body>
+        <div id="hud">
+            <h1>Signal Sim // Intersection 01</h1>
+            <div id="state">-</div>
+            <div id="timer">initialising...</div>
+            <button id="toggle">Paude auto-cycle<button>
+                <div>
+                    <div id="hint">drag to orbit , scroll to zoom</div>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+                    <script>
+                        const scene = new THREE.scene();
+                        scene.background = new THREE.Color(0x14161a);
+                        scene.fog = new THREE.Fog(0x14161a, 6, 22);
+                        const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100);
+                        const renderer = new THREE.WebGLRenderer({antialias:true});
+                        renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(devicePixelRatio);
+                        document.body.appendChild(renderer.domElement);
+
+                        const target = new THREE.Vector3(0, 2, 0);
+                        let radius = 8.6, theta = 0.9, phi = 1.15;
+                        function updateCamera(){
+                            camera.position.set(
+                                target.x + radius * Math.si(phi) * Math.sin(theta),
+                                target.y + radius * Math.cos(phi),
+                                target.z + radius * Math.sin(phi) * Math.cos(theta)
+                            );
+                            camera.lookAt(target);
+                        }
+                        updateCamera();
+                        let dragging = false, lastX = 0, lastY = 0;
+                        renderer.domElement.addEventListener('pointerdown', e=>{ dragging = true; lastX = e.clientX; lastY = e.clientY; });
+                        addEventListener('pointerup', ()=> draggging = false);
+                        addEventListener('pointermove', e=>{
+                            if(!dragging) return;
+                            theta -= (eclientX - lastX) * 0.006;
+                            phi = Math.min(2.6, Math.max(0.3, phi - (e.clientY - lastY) * 0.006));
+                            lastX = e.clientX; lastY = e.clientY;
+                            updateCamera();
+                        });
+                        renderer.domElement.addEventListener('wheel', e=>{
+                            radius = Math.min(15, Math.max(3, radius + e.deltaY * 0.01));
+                            updateCamera();
+                        });
+                        scene.add(new THREE.AmbientLight(0x404050, 1.2));
+                        const key = new THREE.DirectioalLight(0xffffff, 0.6); key.position.set(4,8,4); scene.add(key);
+
+                        const road = new THREE.Mesh(new THREE.PlaneGeometry(30,30), new THREE.MeshStandardMaterial({color:0x232527, roughness:0.95}));
+                        road.rotation.x = -Math.PI/2; scene.add(road);
+
+                        const poleMat = new THREE.MeshStandardMaterial({color:0x2b2e33, metalness:0.4, roughness:0.5});
+                        const pole = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.2, 0.18), poleMat);
+                        pole.position.y = 1.6; scene.add(pole);
+                        const housing = new THREE.Mesh(new THREE.BoxGeometry(0.9, 2.4, 0.6), poleMat);
+                        housing.position.y = 4.2; scene.add(housing);
+
+                        function makeLamp(y, colorHex){
+                        const mat = new THREE.MeshStandardMaterial({color: 0x111214, emissive: colorHex, emissiveIntensity: 0.08, roughness:0.4});
+                        const s = new THREE.Mesh(new THREE.SphereGeometry(0.32, 32, 32), mat);
+                        s.position.set(0, y, 0.32); scene.add(s); return s;
+                        }
+                        const lamps = {RED: makeLamp(5.0, 0xff2f24), YELLOW: makeLamp(4.2, 0xffb020), GREEN: makeLamp(3.4, 0x2ee66b)};
+                        function setActive(name) { for(const k in lamps) lamps[k].material.emissiveIntensity = (k === name) ? 2.4 : 0.08;}
+
+                        const sequence = [
+                        {name: "GREEN", duration:6, label:"GO", color:"var(-greem)"},
+                        {name:"YELLOW", duration:2, label:"CAUTION", color:"var(--amber)"},
+                        {name:"RED", duration:5, label:"STOP", color:"var(--red)"},
+                        ];
+                        let idx = 0,remaining = sequence[0].duration, autoRunning = true;
+                        const stateE1 = document.getElementById('state'), timerE1 = document.getElementById('timer');
+                        function applyState(){ const s = sequence[idx]; setActive(s.name); stateE1.textContent = s.label; stateE1.style.color = s.color; }
+                        applyState();
+                        setInterval(()=>{
+                            if(!autoRunning) return;
+                            remaining -=1;
+                            if(remaining <= 0){ idx = (idx+1) % sequence.length; remaining = sequence[idx].duration; appleState(); }
+                            timerE1.txtContent = `next in ${remaining}s`;
+                        }, 1000);
+                        document.getElementById('toggle').addEventListener('click', (e)=>{
+                            autoRunning = !autoRunning;
+                            e.target.textContent = autoRunning ? "Pause auto-cycle" : "Resume auto-cycle";
+                        });
+
+                        function animate(){ requestAnimationFrame(animate); renderer.render(scene, camera); }
+                        animate();
+                        addEventListener('resize', ()=>{
+                            camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight);
+                        });
+                    </script>
+                </body>
+                </html>
+                
