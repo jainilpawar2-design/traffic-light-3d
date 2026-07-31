@@ -23,12 +23,12 @@
             <h1>Signal Sim // Intersection 01</h1>
             <div id="state">-</div>
             <div id="timer">initialising...</div>
-            <button id="toggle">Paude auto-cycle<button>
-                <div>
+            <button id="toggle">Pause auto-cycle</button>
+        </div>
                     <div id="hint">drag to orbit , scroll to zoom</div>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
                     <script>
-                        const scene = new THREE.scene();
+                        const scene = new THREE.Scene();
                         scene.background = new THREE.Color(0x14161a);
                         scene.fog = new THREE.Fog(0x14161a, 6, 22);
                         const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100);
@@ -40,7 +40,7 @@
                         let radius = 8.6, theta = 0.9, phi = 1.15;
                         function updateCamera(){
                             camera.position.set(
-                                target.x + radius * Math.si(phi) * Math.sin(theta),
+                                target.x + radius * Math.sin(phi) * Math.sin(theta),
                                 target.y + radius * Math.cos(phi),
                                 target.z + radius * Math.sin(phi) * Math.cos(theta)
                             );
@@ -49,10 +49,10 @@
                         updateCamera();
                         let dragging = false, lastX = 0, lastY = 0;
                         renderer.domElement.addEventListener('pointerdown', e=>{ dragging = true; lastX = e.clientX; lastY = e.clientY; });
-                        addEventListener('pointerup', ()=> draggging = false);
+                        addEventListener('pointerup', ()=> dragging = false);
                         addEventListener('pointermove', e=>{
                             if(!dragging) return;
-                            theta -= (eclientX - lastX) * 0.006;
+                            theta -= (e.clientX - lastX) * 0.006;
                             phi = Math.min(2.6, Math.max(0.3, phi - (e.clientY - lastY) * 0.006));
                             lastX = e.clientX; lastY = e.clientY;
                             updateCamera();
@@ -62,7 +62,7 @@
                             updateCamera();
                         });
                         scene.add(new THREE.AmbientLight(0x404050, 1.2));
-                        const key = new THREE.DirectioalLight(0xffffff, 0.6); key.position.set(4,8,4); scene.add(key);
+                        const key = new THREE.DirectionalLight(0xffffff, 0.6); key.position.set(4,8,4); scene.add(key);
 
                         const road = new THREE.Mesh(new THREE.PlaneGeometry(30,30), new THREE.MeshStandardMaterial({color:0x232527, roughness:0.95}));
                         road.rotation.x = -Math.PI/2; scene.add(road);
@@ -82,19 +82,19 @@
                         function setActive(name) { for(const k in lamps) lamps[k].material.emissiveIntensity = (k === name) ? 2.4 : 0.08;}
 
                         const sequence = [
-                        {name: "GREEN", duration:6, label:"GO", color:"var(-greem)"},
+                        {name: "GREEN", duration:6, label:"GO", color:"var(-green)"},
                         {name:"YELLOW", duration:2, label:"CAUTION", color:"var(--amber)"},
                         {name:"RED", duration:5, label:"STOP", color:"var(--red)"},
                         ];
                         let idx = 0,remaining = sequence[0].duration, autoRunning = true;
-                        const stateE1 = document.getElementById('state'), timerE1 = document.getElementById('timer');
-                        function applyState(){ const s = sequence[idx]; setActive(s.name); stateE1.textContent = s.label; stateE1.style.color = s.color; }
+                        const stateEl = document.getElementById('state'), timerE1 = document.getElementById('timer');
+                        function applyState(){ const s = sequence[idx]; setActive(s.name); stateEl.textContent = s.label; stateEl.style.color = s.color; }
                         applyState();
                         setInterval(()=>{
                             if(!autoRunning) return;
                             remaining -=1;
-                            if(remaining <= 0){ idx = (idx+1) % sequence.length; remaining = sequence[idx].duration; appleState(); }
-                            timerE1.txtContent = `next in ${remaining}s`;
+                            if(remaining <= 0){ idx = (idx+1) % sequence.length; remaining = sequence[idx].duration; applyState(); }
+                            timerEl.textContent = `next in ${remaining}s`;
                         }, 1000);
                         document.getElementById('toggle').addEventListener('click', (e)=>{
                             autoRunning = !autoRunning;
