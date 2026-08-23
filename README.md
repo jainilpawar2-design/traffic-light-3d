@@ -1,14 +1,14 @@
-# Signal Sim - 3D Traffic Light Simulator
+# Signal Simulator : 3D Traffic Light Simulator
 
-A 3D traffic light simulation made with HTML, CSS, and Three.js. It cycles through green, yellow, and red like a real traffic signal, with a live countdown timer.
+it's a 3D traffic light simulation made with HTML, CSS, and Three.js. It cycles through green, yellow, and red like a real traffic signal, with a live countdown timer.
 
 ## What it does
 
 - Auto-cycles through GO (green), CAUTION (yellow), and STOP (red)
 - Shows a countdown until the next light change
-- Pause/resume button to freeze the cycle
+- it has Pause/resume button to freeze the cycle
 - Drag to rotate the camera around the scene
-- Scroll to zoom in and out
+-  you can Scroll to zoom in and out
 
 ## Tech used
 
